@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace mediator.Mediator.Abstractions
+namespace Mediator.Abstractions
 {
     public interface IRequestHandler
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using mediator.Mediator.Abstractions;
+using Mediator.Abstractions;
 
-namespace mediator
+namespace customMediator
 {
     class Program
     {
@@ -20,9 +20,15 @@ namespace mediator
                 .Bind<testCommand2 , testCommandHandler2>();
 
 
-            var obj1 =  await mediator.Send<int>(new testCommand(123));
-            var obj2 =  await mediator.Send<int>(new testCommand(12345));
-            var obj3 =  await mediator.Send<int>(new testCommand2("sdsd"));
+            mediator
+                .Subscribe<testNotif , testNotifHandler>()
+                .Subscribe<testNotif , testNotifHandler1>();
+
+
+
+            await mediator.Publish<int>(new testNotif(25));
+
+           
 
         }
     }

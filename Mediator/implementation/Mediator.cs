@@ -2,27 +2,57 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using mediator.Mediator.Abstractions;
+using Mediator.Abstractions;
 
-namespace mediator.Mediator.implementation
+namespace Mediator.implementation
 {
 
     public class Mediator : IMediator
     {
-        public Dictionary<Type , Type > storage = new Dictionary<Type,Type>();
+
+        public Dictionary<Type , Type > Directstorage = new Dictionary<Type,Type>();
+        public Dictionary<Type , List<Type> > BroadcastStorage = new();
 
         public IMediator Bind<TIRequest , TIRequestHandler>() where TIRequest : IRequest where TIRequestHandler : IRequestHandler
         {
-            storage.Add(typeof(TIRequest), typeof(TIRequestHandler));
+            Directstorage.Add(typeof(TIRequest), typeof(TIRequestHandler));
             return this ;
         }
 
+
+
+        public async Task Publish<TResponse>(INotification<TResponse> request)
+        {
+               
+                var Handlers = BroadcastStorage.FirstOrDefault(x => x.Key == request.GetType());
+                
+                if(Handlers.Key == null )
+                    return ;
+                
+                List<Task<object>> tasks = new ();
+                foreach (var handler in Handlers.Value)
+                {
+                    var instance = Activator.CreateInstance(handler);
+
+                    object[] parameters = new object[] { request };
+                    
+                    tasks.Add(Task.Run(() =>  instance.GetType().GetMethod("Handle").Invoke(instance , parameters) ));
+                    
+                }
+                
+                await Task.WhenAll(tasks);
+
+
+        }
+
+
+       
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request)
         {
 
             var requestType = request.GetType();
-            var handlerType =  storage.GetValueOrDefault(requestType)??throw new Exception("No Binding Exist");   
+            var handlerType =  Directstorage.GetValueOrDefault(requestType)??throw new Exception("No Binding Exist");   
 
             var instance = Activator.CreateInstance(handlerType);
 
@@ -32,7 +62,19 @@ namespace mediator.Mediator.implementation
             return tResponse;
         }
 
- 
+        public IMediator Subscribe<TINotification, TNotificationHandler>()
+            where TINotification : INotification
+            where TNotificationHandler : INotificationHandler
+        {
+                var existNotif = BroadcastStorage.FirstOrDefault(x => x.Key == typeof(TINotification));
+
+                if(existNotif.Key == null)
+                    BroadcastStorage.Add(typeof(TINotification), new List<Type>(){typeof(TNotificationHandler)});
+                else 
+                    existNotif.Value.Add(typeof(TNotificationHandler));
+
+                return this ;
+        }
     }
 
 }

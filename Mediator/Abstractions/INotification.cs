@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 
 namespace Mediator.Abstractions
 {
-    public interface IRequest
-    {
-
-    }
-    public interface IRequest<TResponse> : IRequest
+    
+    public interface INotification
     {
         
     }
+
+    public interface INotification<TResponse> : INotification
+    {
+        
+    }
+
 }

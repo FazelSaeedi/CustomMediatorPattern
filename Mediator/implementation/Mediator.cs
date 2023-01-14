@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Mediator.Abstractions;
 
@@ -10,12 +11,12 @@ namespace Mediator.implementation
     public class Mediator : IMediator
     {
 
-        public Dictionary<Type , Type > Directstorage = new Dictionary<Type,Type>();
-        public Dictionary<Type , List<Type> > BroadcastStorage = new();
+        private Dictionary<Type , Type > DirectStorage = new Dictionary<Type,Type>();
+        private Dictionary<Type , List<Type> > BroadcastStorage = new();
 
         public IMediator Bind<TIRequest , TIRequestHandler>() where TIRequest : IRequest where TIRequestHandler : IRequestHandler
         {
-            Directstorage.Add(typeof(TIRequest), typeof(TIRequestHandler));
+            DirectStorage.Add(typeof(TIRequest), typeof(TIRequestHandler));
             return this ;
         }
 
@@ -52,7 +53,7 @@ namespace Mediator.implementation
         {
 
             var requestType = request.GetType();
-            var handlerType =  Directstorage.GetValueOrDefault(requestType)??throw new Exception("No Binding Exist");   
+            var handlerType =  DirectStorage.GetValueOrDefault(requestType)??throw new Exception("No Binding Exist");   
 
             var instance = Activator.CreateInstance(handlerType);
 

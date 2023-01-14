@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Mediator.Abstractions;
 
@@ -11,9 +12,7 @@ namespace customMediator
             
             Console.WriteLine("Hello World!");
 
-
             IMediator mediator = new Mediator.implementation.Mediator();
-
 
             mediator
                 .Bind<testCommand , testCommandHandler>()

@@ -13,14 +13,24 @@ namespace Mediator.implementation
 
         private Dictionary<Type , Type > DirectStorage = new Dictionary<Type,Type>();
         private Dictionary<Type , List<Type> > BroadcastStorage = new();
+        private Assembly Assembly {get ; set ;}
+
+
+        public Mediator(Assembly assembly)
+        {
+            this.Assembly = assembly ;
+        }
+
+        public Mediator()
+        {
+
+        }
 
         public IMediator Bind<TIRequest , TIRequestHandler>() where TIRequest : IRequest where TIRequestHandler : IRequestHandler
         {
             DirectStorage.Add(typeof(TIRequest), typeof(TIRequestHandler));
             return this ;
         }
-
-
 
         public async Task Publish<TResponse>(INotification<TResponse> request)
         {

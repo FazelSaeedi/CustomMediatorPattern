@@ -12,7 +12,7 @@ namespace customMediator
             
             Console.WriteLine("Hello World!");
 
-            IMediator mediator = new Mediator.implementation.Mediator();
+            IMediator mediator = new Mediator.implementation.Mediator(Assembly.GetExecutingAssembly());
 
             mediator
                 .Bind<testCommand , testCommandHandler>()
